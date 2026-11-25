@@ -59,9 +59,11 @@ verwenden dieselben drei UKEbox-Umgebungsvariablen wie der Tageslauf.
 2. UKEbox testen und den historischen Startbestand nach Freigabe übertragen.
 3. Die GitHub Secrets `FP_UKEBOX_WEBDAV_URL`, `FP_UKEBOX_USERNAME` und
    `FP_UKEBOX_APP_PASSWORD` hinterlegen. Für das genehmigte Betriebsfenster
-   die Repository-Variablen `FP_LIVE_ENABLED=true`, `FP_VALID_FROM` und
-   `FP_VALID_UNTIL` setzen. Beide Daten verwenden das Format YYYY-MM-DD.
-   Das inklusive Freigabefenster umfasst höchstens 31 Tage.
+   die Betriebsfreigabe einmal dokumentieren und die Repository-Variablen
+   `FP_LIVE_ENABLED=true` und `FP_VALID_FROM` setzen. Für eine befristete
+   Freigabe zusätzlich `FP_VALID_UNTIL` als letzten freigegebenen Tag setzen.
+   Datumswerte verwenden das Format YYYY-MM-DD und beziehen sich auf
+   Berliner Kalendertage. Bei Widerruf `FP_LIVE_ENABLED` auf `false` setzen.
 4. Auf dem Standardbranch einen manuellen Lauf im Modus `collect`
    abnehmen. Den auskommentierten Zeitplan für 10:15 Uhr Europe/Berlin
    erst nach erfolgreicher Abnahme aktivieren.

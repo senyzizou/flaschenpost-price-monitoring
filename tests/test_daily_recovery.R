@@ -25,6 +25,26 @@ auto = fp_dy_config(root, get = \(key) "")
 auto$enabled = T
 auto$authorization = list(valid_from = "2026-11-25",
   valid_until = "2026-12-10")
+approval = auto
+approval$authorization$valid_until = ""
+stopifnot(fp_dy_authorized(approval, "2026-11-25"),
+  fp_dy_authorized(approval, "2029-01-01"),
+  !fp_dy_authorized(approval, "2026-11-24"))
+approval$authorization$valid_until = NULL
+stopifnot(fp_dy_authorized(approval, "2029-01-01"))
+approval$enabled = F
+stopifnot(!fp_dy_authorized(approval, "2029-01-01"))
+approval$enabled = T
+approval$authorization$valid_until = "2027-11-25"
+stopifnot(fp_dy_authorized(approval, "2027-11-25"),
+  !fp_dy_authorized(approval, "2027-11-26"))
+for (end in c("2026-11-24", "2027-02-30", "2027-1-01", " ")) {
+  approval$authorization$valid_until = end
+  stopifnot(!fp_dy_authorized(approval, "2026-11-25"))
+}
+approval$authorization$valid_until = ""
+approval$authorization$valid_from = ""
+stopifnot(!fp_dy_authorized(approval, "2029-01-01"))
 now = as.POSIXct("2026-11-25 09:15:00", tz = "UTC")
 date = "2026-11-25"
 tr = mock_remote(file.path(scratch, "remote"))

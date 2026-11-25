@@ -12,7 +12,6 @@
     "valid_until": null
   },
   "limits": {
-    "max_authorization_days": 31,
     "max_attempts_per_warehouse_per_day": 2
   }
 }

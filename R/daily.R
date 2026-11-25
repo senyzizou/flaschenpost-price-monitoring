@@ -30,14 +30,17 @@ fp_dy_today = \(auto, now = Sys.time()) {
 
 fp_dy_authorized = \(auto, date) {
   if (!isTRUE(auto$enabled)) return(F)
-  dates = unlist(auto$authorization[c("valid_from", "valid_until")])
-  if (length(dates) != 2L ||
-      any(!grepl("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", dates))) return(F)
-  days = as.Date(dates, format = "%Y-%m-%d")
-  if (anyNA(days) || any(format(days, "%Y-%m-%d") != dates)) return(F)
-  span = as.integer(days[2] - days[1]) + 1L
-  span >= 1L && span <= auto$limits$max_authorization_days &&
-    date >= dates[1] && date <= dates[2]
+  start = auto$authorization$valid_from
+  end = auto$authorization$valid_until
+  valid_date = \(value) {
+    if (!is.character(value) || length(value) != 1L || is.na(value) ||
+        !grepl("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", value)) return(F)
+    parsed = as.Date(value, format = "%Y-%m-%d")
+    !is.na(parsed) && format(parsed, "%Y-%m-%d") == value
+  }
+  if (!valid_date(start) || date < start) return(F)
+  if (is.null(end) || identical(end, "")) return(T)
+  valid_date(end) && end >= start && date <= end
 }
 
 # A release exists only for one warehouse, today, and an existing baseline.
