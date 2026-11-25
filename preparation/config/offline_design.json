@@ -1,0 +1,61 @@
+{
+  "status": "offline_preparation_not_productive",
+  "version": "flaschenpost-design-0.1.0",
+  "live_enabled": false,
+  "live_authorization_required": true,
+  "network_runner_implemented": false,
+  "postal_code": "10997",
+  "fulfillment_mode": "delivery",
+  "discovery_roots": [
+    "/bier",
+    "/weine",
+    "/spirituosen"
+  ],
+  "roots_are_not_a_closed_category_whitelist": true,
+  "preserve_literal_discovered_paths": true,
+  "deduplication_key": [
+    "retailer",
+    "postal_code",
+    "fulfillment_mode",
+    "variant_id"
+  ],
+  "product_url_is_not_variant_key": true,
+  "no_lo_retained": true,
+  "statistics_min_abv_pct_inclusive": 0.5,
+  "analysis_categories": [
+    "Bier",
+    "Wein",
+    "Schaumwein",
+    "Spirituosen",
+    "Zwischenerzeugnisse ≤15 % vol",
+    "Zwischenerzeugnisse >15 % vol",
+    "Alkopops"
+  ],
+  "classification_adapter": "pending_explicit_population_and_version_review",
+  "classification_approved": false,
+  "price_formula_changes": false,
+  "abv_cache_max_age_days": 30,
+  "cache_age_policy": "proposed_not_live_validated",
+  "cache_requires_source_sha256": true,
+  "cache_requires_unchanged_name_parent_and_pack": true,
+  "force_detail_on_current_qualified_conflicting_or_changed_evidence": true,
+  "fresh_prices_required_each_day": true,
+  "carry_forward_missing_prices": false,
+  "removal_requires_distinct_complete_inventories": 2,
+  "delete_removed_products": false,
+  "missing_from_partial_run_confirms_removal": false,
+  "complete_statistics_require_full_discovery_and_data_and_approved_rules": true,
+  "truncated_capture_is_complete": false,
+  "single_unchanged_scroll_proves_end": false,
+  "unknown_category_controls_are_resolved": false,
+  "dependency_versions": {
+    "xml2": "1.5.2",
+    "jsonlite": "2.0.0",
+    "digest": "0.6.39",
+    "httr2": "1.3.0",
+    "dplyr": "1.2.1",
+    "tibble": "3.3.1"
+  },
+  "installation_allowed": false,
+  "central_renv_modified": false
+}

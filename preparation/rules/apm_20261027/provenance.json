@@ -1,0 +1,212 @@
+{
+  "version": "fp-frozen-apm-20261027-1",
+  "classification_version": "beverage-0.7.1",
+  "price_analysis_version": "price-analysis-0.4.1",
+  "snapshot_classification_version": "beverage-0.9.1",
+  "snapshot_analysis_version": "price-analysis-0.5.0",
+  "definitions_sha256": "ec0adefd9720ee85d335d8bcece6df9073abf0734193faea6729b76f637ed8a4",
+  "imports": {
+    "dplyr": [
+      "%>%",
+      "case_when",
+      "coalesce",
+      "if_else",
+      "mutate",
+      "recode",
+      "setdiff"
+    ],
+    "tibble": [
+      "as_tibble",
+      "tribble"
+    ],
+    "stats": "setNames",
+    "utils": "tail"
+  },
+  "definitions": {
+    "clean_text": {
+      "name": "clean_text",
+      "source": "utils.R",
+      "start": 37,
+      "end": 40,
+      "original_date_started": "261007",
+      "source_sha256": "02d80c66d30cf50dbedbc5668b05423a7a86b5844b95184c4018bd25318100a3"
+    },
+    "no_lo_levels": {
+      "name": "no_lo_levels",
+      "source": "quality.R",
+      "start": 18,
+      "end": 19,
+      "original_date_started": "261012",
+      "source_sha256": "a32ca984f26ac4a11bc9cef31a8b65b80acb2cc9e4110550837dba6d9ad761b3"
+    },
+    "match_groups": {
+      "name": "match_groups",
+      "source": "retailers/conalco.R",
+      "start": 61,
+      "end": 66,
+      "original_date_started": "261007",
+      "source_sha256": "69adcd941ae84e33a61f53e212cfae56ee41bc73df19c3b68e5649c1574a0850"
+    },
+    "CLASSIFICATION_VERSION": {
+      "name": "CLASSIFICATION_VERSION",
+      "source": "classification.R",
+      "start": 16,
+      "end": 16,
+      "original_date_started": "261012",
+      "source_sha256": "1a75225c6dd9076c259e8017260d9dc6f363f5313be059bc137ab2af7714ed1b"
+    },
+    "family_patterns": {
+      "name": "family_patterns",
+      "source": "classification.R",
+      "start": 19,
+      "end": 116,
+      "original_date_started": "261012",
+      "source_sha256": "1a75225c6dd9076c259e8017260d9dc6f363f5313be059bc137ab2af7714ed1b"
+    },
+    "classification_rules": {
+      "name": "classification_rules",
+      "source": "classification.R",
+      "start": 127,
+      "end": 206,
+      "original_date_started": "261012",
+      "source_sha256": "1a75225c6dd9076c259e8017260d9dc6f363f5313be059bc137ab2af7714ed1b",
+      "supplemental_source_lines": 207
+    },
+    "scope_patterns": {
+      "name": "scope_patterns",
+      "source": "classification.R",
+      "start": 216,
+      "end": 248,
+      "original_date_started": "261012",
+      "source_sha256": "1a75225c6dd9076c259e8017260d9dc6f363f5313be059bc137ab2af7714ed1b"
+    },
+    "classify_products": {
+      "name": "classify_products",
+      "source": "classification.R",
+      "start": 259,
+      "end": 433,
+      "original_date_started": "261012",
+      "source_sha256": "1a75225c6dd9076c259e8017260d9dc6f363f5313be059bc137ab2af7714ed1b"
+    },
+    "retailer_rtd_patterns": {
+      "name": "retailer_rtd_patterns",
+      "source": "classification.R",
+      "start": 443,
+      "end": 450,
+      "original_date_started": "261012",
+      "source_sha256": "1a75225c6dd9076c259e8017260d9dc6f363f5313be059bc137ab2af7714ed1b"
+    },
+    "evidence_rtd_patterns": {
+      "name": "evidence_rtd_patterns",
+      "source": "classification.R",
+      "start": 456,
+      "end": 459,
+      "original_date_started": "261012",
+      "source_sha256": "1a75225c6dd9076c259e8017260d9dc6f363f5313be059bc137ab2af7714ed1b"
+    },
+    "retailer_rtd_candidates": {
+      "name": "retailer_rtd_candidates",
+      "source": "classification.R",
+      "start": 461,
+      "end": 470,
+      "original_date_started": "261012",
+      "source_sha256": "1a75225c6dd9076c259e8017260d9dc6f363f5313be059bc137ab2af7714ed1b"
+    },
+    "classify_alkopops": {
+      "name": "classify_alkopops",
+      "source": "classification.R",
+      "start": 472,
+      "end": 725,
+      "original_date_started": "261012",
+      "source_sha256": "1a75225c6dd9076c259e8017260d9dc6f363f5313be059bc137ab2af7714ed1b"
+    },
+    "conalco_evidence_sections": {
+      "name": "conalco_evidence_sections",
+      "source": "classification.R",
+      "start": 734,
+      "end": 767,
+      "original_date_started": "261012",
+      "source_sha256": "1a75225c6dd9076c259e8017260d9dc6f363f5313be059bc137ab2af7714ed1b"
+    },
+    "conalco_component_patterns": {
+      "name": "conalco_component_patterns",
+      "source": "classification.R",
+      "start": 776,
+      "end": 807,
+      "original_date_started": "261012",
+      "source_sha256": "1a75225c6dd9076c259e8017260d9dc6f363f5313be059bc137ab2af7714ed1b"
+    },
+    "conalco_rtd_evidence": {
+      "name": "conalco_rtd_evidence",
+      "source": "classification.R",
+      "start": 816,
+      "end": 1188,
+      "original_date_started": "261012",
+      "source_sha256": "1a75225c6dd9076c259e8017260d9dc6f363f5313be059bc137ab2af7714ed1b"
+    },
+    "PRICE_ANALYSIS_VERSION": {
+      "name": "PRICE_ANALYSIS_VERSION",
+      "source": "price_analysis.R",
+      "start": 16,
+      "end": 16,
+      "original_date_started": "261015",
+      "source_sha256": "32081e352a2b7d4d50dffa9c4b0890d41988fa915311066070359ac38a79044f"
+    },
+    "ANALYSIS_CATEGORIES": {
+      "name": "ANALYSIS_CATEGORIES",
+      "source": "price_analysis.R",
+      "start": 17,
+      "end": 18,
+      "original_date_started": "261015",
+      "source_sha256": "32081e352a2b7d4d50dffa9c4b0890d41988fa915311066070359ac38a79044f"
+    },
+    "ETHANOL_DENSITY_G_ML": {
+      "name": "ETHANOL_DENSITY_G_ML",
+      "source": "price_analysis.R",
+      "start": 19,
+      "end": 19,
+      "original_date_started": "261015",
+      "source_sha256": "32081e352a2b7d4d50dffa9c4b0890d41988fa915311066070359ac38a79044f"
+    },
+    "assign_price_categories": {
+      "name": "assign_price_categories",
+      "source": "price_analysis.R",
+      "start": 22,
+      "end": 202,
+      "original_date_started": "261015",
+      "source_sha256": "32081e352a2b7d4d50dffa9c4b0890d41988fa915311066070359ac38a79044f"
+    },
+    "SNAPSHOT_CLASSIFICATION_VERSION": {
+      "name": "SNAPSHOT_CLASSIFICATION_VERSION",
+      "source": "snapshot_analysis.R",
+      "start": 16,
+      "end": 16,
+      "original_date_started": "261016",
+      "source_sha256": "3d87bd7d1ee76a14807b00d4420e99ce23fc300c69314026ce9132d312fa393f"
+    },
+    "SNAPSHOT_ANALYSIS_VERSION": {
+      "name": "SNAPSHOT_ANALYSIS_VERSION",
+      "source": "snapshot_analysis.R",
+      "start": 17,
+      "end": 17,
+      "original_date_started": "261016",
+      "source_sha256": "3d87bd7d1ee76a14807b00d4420e99ce23fc300c69314026ce9132d312fa393f"
+    },
+    "snapshot_product_style": {
+      "name": "snapshot_product_style",
+      "source": "snapshot_analysis.R",
+      "start": 19,
+      "end": 106,
+      "original_date_started": "261016",
+      "source_sha256": "3d87bd7d1ee76a14807b00d4420e99ce23fc300c69314026ce9132d312fa393f"
+    },
+    "snapshot_intermediate_evidence": {
+      "name": "snapshot_intermediate_evidence",
+      "source": "snapshot_analysis.R",
+      "start": 130,
+      "end": 197,
+      "original_date_started": "261016",
+      "source_sha256": "3d87bd7d1ee76a14807b00d4420e99ce23fc300c69314026ce9132d312fa393f"
+    }
+  }
+}

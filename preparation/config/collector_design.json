@@ -1,0 +1,158 @@
+{
+  "status": "offline_collector_not_authorized",
+  "version": "flaschenpost-collector-0.1.0",
+  "api_base": "https://www.flaschenpost.de/php-product-api/v1",
+  "user_agent": "APM-research-collector (academic price monitoring)",
+  "timeout_seconds": 30,
+  "max_retries": 2,
+  "retry_pause_seconds": 30,
+  "detail_batch_size": 20,
+  "scope_root_external_ids": [
+    19,
+    23,
+    24
+  ],
+  "scope_note": "Bier, Weine, Spirituosen; other roots are listed, not fetched",
+  "nonbeverage_subcategory_ids": [
+    476
+  ],
+  "nonbeverage_note": "476 = Tabakwaren under Spirituosen; excluded by review",
+  "required_attributes": [
+    "Volume",
+    "VolumeUnit",
+    "ItemsInFrame",
+    "IsAvailable"
+  ],
+  "warehouse_id": 36,
+  "warehouse_verification": {
+    "status": "verified",
+    "independent_sessions": 2,
+    "method": "independent delivery-area verification, 2026-10-26",
+    "caveat": "second session = reset client state, not a second device"
+  },
+  "reviewed_subcategory_ids": [
+    397,
+    392,
+    390,
+    398,
+    400,
+    394,
+    395,
+    396,
+    393,
+    399,
+    486,
+    443,
+    439,
+    438,
+    435,
+    441,
+    540,
+    539,
+    459,
+    473,
+    451,
+    447,
+    448,
+    452,
+    449,
+    450,
+    453,
+    541,
+    542,
+    472
+  ],
+  "reviewed_note": "w36 tree 2026-10-26: 31 in-scope subcategories, 476 excluded",
+  "probe_outside_scope_ids": [
+    379,
+    543
+  ],
+  "probe_note": "Tonic & Mixgetraenke, Wasser Mixkiste: checked for alcohol",
+  "abv_evidence_file": "config/flaschenpost_abv_evidence.csv",
+  "analysis_hints": {
+    "direct": {
+      "Bier": [
+        397,
+        392,
+        390,
+        400,
+        394,
+        395,
+        396,
+        393,
+        399
+      ],
+      "Wein": [
+        443,
+        439,
+        438,
+        540,
+        539
+      ],
+      "Schaumwein": [
+        441
+      ],
+      "Spirituosen": [
+        447,
+        448,
+        449,
+        450,
+        453
+      ]
+    },
+    "review": {
+      "Bier_or_Mix": [
+        398
+      ],
+      "Wein_or_Mix": [
+        435
+      ],
+      "Spirituose_or_Zwischenerzeugnis": [
+        451,
+        452
+      ],
+      "Alkopops_or_Mix": [
+        542
+      ],
+      "Alkoholfrei_Spirituose": [
+        541
+      ]
+    },
+    "aggregate_ignored": [
+      486,
+      473,
+      472,
+      459
+    ],
+    "note": "Hints only; classification is not approved"
+  },
+  "category_vocabulary": {
+    "397": "bier",
+    "392": "bier",
+    "390": "bier",
+    "398": "bier",
+    "400": "bier",
+    "394": "bier",
+    "395": "bier",
+    "393": "bier",
+    "399": "bier",
+    "443": "weißwein",
+    "439": "rotwein",
+    "438": "roséwein",
+    "441": "sekt",
+    "447": "vodka",
+    "448": "gin",
+    "449": "whisky",
+    "450": "rum",
+    "452": "likör",
+    "453": "spirituosen"
+  },
+  "category_vocabulary_note": "Flaschenpost subcategory -> term of the project retailer-category rules C02-C05",
+  "mixer_subcategory_ids": [
+    542,
+    472
+  ],
+  "mixer_note": "aggregate/mixer lists: no-alcohol ingredient lists exclude the SKU",
+  "classifier_rules_manifest": "rules/apm_20261027/provenance.json",
+  "classifier_rules_sha256": "4ccf890b058cf5989cde10f88c023558fc4b7d7f3ccbe4a885f9023449dd0ab9"
+}

@@ -1,0 +1,13 @@
+sku,warehouse_id,product_key,product_name,price_cents,price_eur,regional_price,reduced_price_cents,reduced_10_cents,reduced_20_cents,reduced_30_cents,reduced_40_cents,deposit_total_eur,deposit_per_frame_eur,pack_count,unit_volume_l,total_volume_l,available,content_kind,article_description,container_type,brand,subcategory_ids,alcohol_content,price_category,analysis_ready
+"5909",12,"3598","Berliner Pilsner",1249,12.49,FALSE,999,1124,999,874,749,3.1,1.5,20,0.5,10,TRUE,"volume","20 x 0,5L (Glas)","MWGlass_Individual","Berliner Pilsner","397",5,"Bier",TRUE
+"6145",12,"3786","Berliner Kindl",1649,16.49,FALSE,1319,1484,1319,1154,989,3.1,1.5,20,0.5,10,TRUE,"volume","20 x 0,5L (Glas)","MWGlass_Individual","Berliner Kindl","397",5.1,"Bier",TRUE
+"741",12,"558","Krombacher Pils",1999,19.99,FALSE,1599,1799,1599,1399,1199,3.1,1.5,20,0.5,10,TRUE,"volume","20 x 0,5L (Glas)","MWGlass_Individual","Krombacher","397",4.8,"Bier",TRUE
+"685",12,"514","Jever Pilsener",1949,19.49,FALSE,1559,1754,1559,1364,1169,3.1,1.5,20,0.5,10,FALSE,"volume","20 x 0,5L (Glas)","MWGlass_Individual","Jever","397",4.9,"Bier",TRUE
+"1100",12,"700","Schneider Weisse",1699,16.99,FALSE,1359,1529,1359,1189,1019,3.1,1.5,20,0.5,10,TRUE,"volume","20 x 0,5L (Glas)","MWGlass_Individual","Schneider Weisse","393",5.4,"Bier",TRUE
+"2001",12,"1200","Riesling Trocken",599,5.99,FALSE,479,539,479,419,359,0,0,1,0.75,0.75,TRUE,"volume","1 x 0,75L (Glas)","Glass_OneWay","Weingut Mueller","439",12.5,"Wein",TRUE
+"2002",12,"1201","Chardonnay",699,6.99,FALSE,559,629,559,489,419,0,0,1,0.75,0.75,TRUE,"volume","1 x 0,75L (Glas)","Glass_OneWay","Weingut Schmitt","443",13,"Wein",TRUE
+"3001",12,"2000","Absolut Vodka",1349,13.49,FALSE,1079,1214,1079,944,809,0.25,0.25,1,0.7,0.7,TRUE,"volume","1 x 0,7L (Glas)","Glass_OneWay","Absolut","447",40,"Spirituosen",TRUE
+"3002",12,"2001","Jack Daniels",2199,21.99,FALSE,1759,1979,1759,1539,1319,0.25,0.25,1,0.7,0.7,TRUE,"volume","1 x 0,7L (Glas)","Glass_OneWay","Jack Daniels","449",40,"Spirituosen",TRUE
+"4001",12,"3000","Rotkäppchen Sekt",499,4.99,FALSE,399,449,399,349,299,0.25,0.25,1,0.75,0.75,TRUE,"volume","1 x 0,75L (Glas)","Glass_OneWay","Rotkäppchen","441",11,"Schaumwein",TRUE
+"5001",12,"5000","Koelsch Reissdorf",1399,13.99,FALSE,1119,1259,1119,979,839,3.1,1.5,20,0.5,10,TRUE,"volume","20 x 0,5L (Glas)","MWGlass_Individual","Reissdorf","397",4.8,"Bier",TRUE
+"9901",12,"9000","Erdnuesse gesalzen",299,2.99,FALSE,239,269,239,209,179,0,0,1,0,0,TRUE,"mass","1 x 200g","Bag","Funny Frisch","476",NA,NA,FALSE

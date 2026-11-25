@@ -1,0 +1,18 @@
+{
+  "enabled": false,
+  "timezone": "Europe/Berlin",
+  "warehouse_order": [
+    36
+  ],
+  "allowed_category_sets": [
+    "reviewed_w36"
+  ],
+  "authorization": {
+    "valid_from": null,
+    "valid_until": null
+  },
+  "limits": {
+    "max_authorization_days": 31,
+    "max_attempts_per_warehouse_per_day": 2
+  }
+}

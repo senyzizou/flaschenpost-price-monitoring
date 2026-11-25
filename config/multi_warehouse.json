@@ -1,0 +1,34 @@
+{
+  "version": "multi-warehouse-0.2.0",
+  "retailer": "flaschenpost",
+  "timezone": "Europe/Berlin",
+  "reference_warehouse_id": 36,
+  "min_independent_sessions_for_production": 2,
+  "warehouses": [
+    {
+      "warehouse_id": 36,
+      "label": "Berlin-Kreuzberg",
+      "independent_sessions": 2,
+      "category_set": "reviewed_w36",
+      "observation_unit": true
+    }
+  ],
+  "release": {
+    "max_navigations_per_warehouse": 250,
+    "max_seconds_per_warehouse": 1800,
+    "released_warehouses": []
+  },
+  "privacy": {
+    "forbidden_columns": [
+      "street",
+      "house_number",
+      "full_address",
+      "cookie_value",
+      "session_token",
+      "postal_code"
+    ],
+    "forbidden_path_parts": [
+      ".git"
+    ]
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "version": "flaschenpost-regional-0.1.0",
+  "min_request_interval_seconds": 10,
+  "warehouses": {}
+}

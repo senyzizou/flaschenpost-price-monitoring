@@ -1,0 +1,8 @@
+"sku","product_key","product_name","total_volume_l","alcohol_content","evidence_ref","evidence_sha256"
+"5909","3598","Berliner Pilsner","10.0","5.0","pilot_2026-10-23:flaschenpost/raw/13_detail_beer_loaded.txt","5ebee6983461e8823148154f01842190900bb300ef7dba103ee1546a4244a389"
+"24077","20525","Reinform Grauer Burgunder trocken","3.0","12.0","pilot_2026-10-23:flaschenpost/raw/16_detail_wine.txt","02e11d0f16484422e38e2b6c9814163d5c2769475395180d11b4c4f5b4d75e66"
+"18982","15599","Lacheteau Brut Cremant de Loire","0.75","12.0","pilot_2026-10-23:flaschenpost/raw/19_detail_sparkling.txt","a7a0c826bdcb4c7a7ef54f2c7b2d4731d61d5c03d25723cfe5ea707cd45f2a28"
+"4277","3163","Campari Bitter","0.7","25.0","pilot_2026-10-23:flaschenpost/raw/22_detail_spirit.txt","ab68d002ba06513b492cca2c825814eabe038fbbb39d3f182b92f2307de78d4a"
+"19023","8325","Aperol Spritz","0.6","10.5","pilot_2026-10-23:flaschenpost/raw/25_detail_rtd.txt","f5748c158961da3f648152fdff6a0ce77af236a85a23939dc109d9889d9ffebc"
+"677","508","Jever Fun","10.0","0.35","pilot_2026-10-23:flaschenpost/raw/28_detail_nolo.txt","50323ea54f374c9616f7668294af3b4ac44fab7bdfc10a7fd3215337938e23b0"
+"24221","19295","Peroni Nastro Azzurro 0,0%","7.92","0.0","pilot_2026-10-23:flaschenpost/raw/30_detail_nested_pack.txt","002dff96313ddbf50b79c2ec516a6b8124acd04971304becd33cc6e7ae756bcf"

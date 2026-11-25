@@ -1,0 +1,88 @@
+name: Flaschenpost w36
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Offline plan or approved w36 collection
+        type: choice
+        options:
+          - offline
+          - collect
+        default: offline
+  # Enable after the Ubuntu, UKEbox and manual collection checks pass.
+  # schedule:
+  #   - cron: '15 10 * * *'
+  #     timezone: Europe/Berlin
+
+permissions:
+  contents: read
+
+concurrency:
+  group: flaschenpost-daily
+  cancel-in-progress: false
+
+jobs:
+  w36:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      TZ: Europe/Berlin
+      LANG: C.UTF-8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05
+        with:
+          r-version: '4.6.0'
+          use-public-rspm: false
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            libcurl4-openssl-dev libssl-dev libxml2-dev zlib1g-dev
+      - name: Cache pinned R packages
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684
+        with:
+          path: ${{ runner.temp }}/flaschenpost-r
+          key: ubuntu-24.04-${{ runner.arch }}-r-4.6.0-${{ hashFiles('preparation/config/ubuntu_packages.csv', 'scripts/install_packages.R') }}
+      - name: Install pinned R packages
+        env:
+          FP_ISOLATED_R_LIBRARY: ${{ runner.temp }}/flaschenpost-r
+        run: |
+          Rscript --vanilla scripts/install_packages.R --install-for-preflight
+          printf 'R_LIBS_USER=%s\n' "$FP_ISOLATED_R_LIBRARY" >> "$GITHUB_ENV"
+      - name: Offline checks and plan
+        env:
+          REQUESTED_MODE: ${{ inputs.mode }}
+          DEFAULT_REF: refs/heads/${{ github.event.repository.default_branch }}
+        run: |
+          if [ "$REQUESTED_MODE" = collect ] && [ "$GITHUB_REF" != "$DEFAULT_REF" ]; then
+            echo 'Collection requires the default branch.'
+            exit 1
+          fi
+          Rscript --vanilla scripts/check_release.R
+          Rscript --vanilla tests/test_ci_synthetic.R
+          Rscript --vanilla tests/test_versioned.R
+          Rscript --vanilla tests/test_remote_state.R
+          Rscript --vanilla tests/test_daily_recovery.R
+          Rscript --vanilla scripts/daily_flaschenpost.R --plan
+      - name: Collect or recover w36
+        if: >-
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+          (github.event_name == 'schedule' || inputs.mode == 'collect')
+        env:
+          FP_LIVE_ENABLED: ${{ vars.FP_LIVE_ENABLED }}
+          FP_VALID_FROM: ${{ vars.FP_VALID_FROM }}
+          FP_VALID_UNTIL: ${{ vars.FP_VALID_UNTIL }}
+          FP_UKEBOX_WEBDAV_URL: ${{ secrets.FP_UKEBOX_WEBDAV_URL }}
+          FP_UKEBOX_USERNAME: ${{ secrets.FP_UKEBOX_USERNAME }}
+          FP_UKEBOX_APP_PASSWORD: ${{ secrets.FP_UKEBOX_APP_PASSWORD }}
+        run: Rscript --vanilla scripts/daily_flaschenpost.R --run
+      - name: Report outcome
+        if: always()
+        env:
+          WORKFLOW_RESULT: ${{ job.status }}
+          RUN_MODE: ${{ inputs.mode || github.event_name }}
+        run: printf 'Mode %s · outcome %s\n' "$RUN_MODE" "$WORKFLOW_RESULT" >> "$GITHUB_STEP_SUMMARY"
