@@ -43,9 +43,21 @@ version_in_job = \(pkg) tryCatch(as.character(packageVersion(pkg,
   lib.loc = library_dir)), error = \(e) "")
 if (!identical(version_in_job("remotes"), "2.5.0") &&
     any(vapply(packages$package, version_in_job, "") != packages$version)) {
-  install.packages(paste0("https://cran.r-project.org/src/contrib/Archive/",
-    "remotes/remotes_2.5.0.tar.gz"), repos = NULL, type = "source",
+  source_file = tempfile(fileext = ".tar.gz")
+  urls = paste0("https://cran.r-project.org/src/contrib/",
+    c("", "Archive/remotes/"), "remotes_2.5.0.tar.gz")
+  downloaded = F
+  for (url in urls) {
+    downloaded = tryCatch(
+      suppressWarnings(download.file(url, source_file, mode = "wb",
+        quiet = T)) == 0L, error = \(e) F)
+    if (downloaded) break
+  }
+  if (!downloaded) stop("Pinned remotes 2.5.0 could not be downloaded.")
+  install.packages(source_file, repos = NULL, type = "source",
     lib = library_dir, quiet = T)
+  unlink(source_file)
+  stopifnot(identical(version_in_job("remotes"), "2.5.0"))
 }
 for (i in seq_len(nrow(packages))) {
   pkg = packages$package[i]
