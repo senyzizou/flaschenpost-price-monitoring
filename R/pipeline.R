@@ -98,7 +98,7 @@ fp_pl_from_proof = \(root, proof_dir,
 fp_pl_from_assessed_run = \(root, run_dir, prior_dir = NULL, date,
   warehouse_id, prior_texts_csv = NULL,
   work_dir = tempfile("fp_assessed_"), prior = NULL,
-  reference = NULL, require_classification = F) {
+  reference = NULL, require_classification = F, reassessment = NULL) {
   assessment = fp_cv_assess(
     run_dir, prior_dir, prior_texts_csv,
     prior = prior, reference = reference,
@@ -137,13 +137,14 @@ fp_pl_from_assessed_run = \(root, run_dir, prior_dir = NULL, date,
   extra = list(
     coverage_assessment = list(
       passed = T,
-      version = "fp-coverage-1.0",
+      version = "fp-coverage-1.1",
       collector_blocker = fp_cv_category_blocker,
       checks_passed = nrow(assessment$checks),
       baseline = assessment$baseline,
       prior_reference = prior_label
     )
   )
+  if (!is.null(reassessment)) extra$reassessment = reassessment
   ingest = fp_mg_daily_adapter(
     root, run_dir, date,
     basename(dirname(run_dir)),

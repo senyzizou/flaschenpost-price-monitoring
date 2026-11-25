@@ -191,7 +191,7 @@ fp_lr_collector_config = \(base, mw, cfg, wid, store, date) {
 # <-----------------------------------------------------------------------------
 
 fp_lr_assess_and_commit = \(root, store, mw, stored, date, wid,
-  blocking) {
+  blocking, reassessment = NULL) {
   if (length(blocking) &&
       !identical(as.character(blocking), fp_cv_category_blocker)) {
     return(list(status = "blocked_collector", blocking = blocking,
@@ -210,7 +210,7 @@ fp_lr_assess_and_commit = \(root, store, mw, stored, date, wid,
   res = fp_pl_from_assessed_run(
     store, stored, date = date, warehouse_id = wid,
     prior = prior, reference = reference,
-    require_classification = T
+    require_classification = T, reassessment = reassessment
   )
   res$run_dir = stored
   res
@@ -218,7 +218,7 @@ fp_lr_assess_and_commit = \(root, store, mw, stored, date, wid,
 
 fp_lr_run_warehouse = \(root, fp, mw, cfg, wid, date, store,
   out_base, collect_fn = NULL, sleep = Sys.sleep, transport = NULL,
-  clock = Sys.time, run_id = NULL) {
+  clock = Sys.time, run_id = NULL, reassessment = NULL) {
   wid = as.integer(wid)
   collector = fp_lr_collector_config(
     fp$collector, mw, cfg, wid, store, date
@@ -258,7 +258,7 @@ fp_lr_run_warehouse = \(root, fp, mw, cfg, wid, date, store,
     result, run_dir, runner, run_date = as.Date(date)
   )
   assessed = fp_lr_assess_and_commit(
-    root, store, mw, stored, date, wid, result$checks$blocking
+    root, store, mw, stored, date, wid, result$checks$blocking, reassessment
   )
   assessed$calls = result$calls
   assessed$raw_dir = raw_dir

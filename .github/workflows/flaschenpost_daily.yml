@@ -4,13 +4,26 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: Offline plan, UKEbox probe, or approved w36 collection
+        description: Offline plan, UKEbox probe, collection, or offline reassessment
         type: choice
         options:
           - offline
           - ukebox_probe
           - collect
+          - reassess
         default: offline
+      reassess_date:
+        description: Archived Berlin date (YYYY-MM-DD)
+        type: string
+      reassess_attempt:
+        description: Archived attempt ID (aNN)
+        type: string
+      capture_revision:
+        description: Original capture commit SHA
+        type: string
+      expected_skus:
+        description: Observed SKU count independently confirmed by replay
+        type: string
   # Enable after the Ubuntu, UKEbox and manual collection checks pass.
   # schedule:
   #   - cron: '15 10 * * *'
@@ -34,6 +47,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
+          fetch-depth: ${{ inputs.mode == 'reassess' && '0' || '1' }}
       - uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05
         with:
           r-version: '4.6.0'
@@ -60,7 +74,7 @@ jobs:
           DEFAULT_REF: refs/heads/${{ github.event.repository.default_branch }}
         run: |
           case "$REQUESTED_MODE" in
-            collect|ukebox_probe)
+            collect|ukebox_probe|reassess)
               if [ "$GITHUB_REF" != "$DEFAULT_REF" ]; then
                 echo 'Online operations require the default branch.'
                 exit 1
@@ -83,6 +97,22 @@ jobs:
           FP_UKEBOX_USERNAME: ${{ secrets.FP_UKEBOX_USERNAME }}
           FP_UKEBOX_APP_PASSWORD: ${{ secrets.FP_UKEBOX_APP_PASSWORD }}
         run: Rscript --vanilla scripts/historical_archive.R --probe
+      - name: Reassess archived w36 attempt
+        if: >-
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+          github.event_name == 'workflow_dispatch' && inputs.mode == 'reassess'
+        env:
+          FP_REASSESS_AUTHORIZED: 'true'
+          REASSESS_DATE: ${{ inputs.reassess_date }}
+          REASSESS_ATTEMPT: ${{ inputs.reassess_attempt }}
+          CAPTURE_REVISION: ${{ inputs.capture_revision }}
+          EXPECTED_SKUS: ${{ inputs.expected_skus }}
+          FP_UKEBOX_WEBDAV_URL: ${{ secrets.FP_UKEBOX_WEBDAV_URL }}
+          FP_UKEBOX_USERNAME: ${{ secrets.FP_UKEBOX_USERNAME }}
+          FP_UKEBOX_APP_PASSWORD: ${{ secrets.FP_UKEBOX_APP_PASSWORD }}
+        run: |
+          Rscript --vanilla scripts/daily_flaschenpost.R --reassess \
+            "$REASSESS_DATE" "$REASSESS_ATTEMPT" "$CAPTURE_REVISION" "$EXPECTED_SKUS"
       - name: Collect or recover w36
         if: >-
           github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&

@@ -478,6 +478,26 @@ fp_rm_archive_members = \(archive, expected) {
   invisible(T)
 }
 
+# Read-only verification for stores created before capture checkpoints.
+fp_rm_verify_historical_archive = \(transport, date, wid, run_id) {
+  stopifnot(grepl("^[A-Za-z0-9_-]+$", run_id))
+  stem = paste0(fp_rm_base, "/raw/", date, "/w", wid, "_", run_id)
+  marker = tempfile("fp_old_marker_")
+  archive = tempfile("fp_old_archive_")
+  on.exit(unlink(c(marker, archive)), add = T)
+  if (!fp_rm_get(transport, paste0(stem, ".json"), marker)) return(F)
+  meta = jsonlite::read_json(marker, simplifyVector = T)
+  stopifnot(identical(meta$version, "fp-remote-raw-1"),
+    identical(meta$date, date), identical(meta$run_id, run_id),
+    identical(meta$warehouse_id, as.integer(wid)),
+    nrow(meta$files) > 0L,
+    fp_rm_get(transport, paste0(stem, ".tar.gz"), archive),
+    identical(fp_vs_hash(archive), meta$tar_sha256),
+    file.size(archive) == meta$tar_bytes)
+  fp_rm_archive_members(archive, meta$files)
+  T
+}
+
 # Existing pilot archive format, with readback even on a repeated transfer.
 fp_rm_archive_raw = \(transport, raw_dir, date, wid, run_id) {
   stopifnot(grepl("^[A-Za-z0-9_-]+$", run_id))

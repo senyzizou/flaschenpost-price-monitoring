@@ -71,6 +71,10 @@ fp_cv_alcohol_evidence = \(prior, texts) {
   evidence[by_text] = "non_alcoholic"
   reason[by_text] = "ingredients_without_alcohol_terms"
   reason[!not_applicable & hit] = "ingredients_with_alcohol_terms"
+  abv = suppressWarnings(as.numeric(prior$alcohol_content))
+  measured = which(is.finite(abv) & abv > 0.5)
+  evidence[measured] = "alcoholic"
+  reason[measured] = "recorded_abv_gt_0_5"
   data.frame(
     sku = prior$sku,
     evidence = evidence,
@@ -190,6 +194,8 @@ fp_cv_assess = \(run_dir, prior_dir = NULL, prior_texts_csv = NULL,
   add("sku_unique", !anyDuplicated(v$sku) && all(nzchar(v$sku)))
   add("membership_matches_variants",
     setequal(unique(cur$membership$sku), v$sku))
+  add("membership_uses_fetched_categories",
+    all(cur$membership$sub_id %in% listed))
   per_sub = tapply(
     cur$membership$sku, cur$membership$sub_id,
     \(x) length(unique(x))
@@ -209,6 +215,8 @@ fp_cv_assess = \(run_dir, prior_dir = NULL, prior_texts_csv = NULL,
 
   prior_member = old$membership
   prior_v = old$variants
+  # The coverage checks above validate the present tree and its listings.
+  # An absent SKU is recorded separately from availability or delisting.
   miss = setdiff(prior_v$sku, v$sku)
   fresh = setdiff(v$sku, prior_v$sku)
   cats_of = \(m, s) tapply(
@@ -226,14 +234,9 @@ fp_cv_assess = \(run_dir, prior_dir = NULL, prior_texts_csv = NULL,
 
   p_miss = prior_v[match(miss, prior_v$sku), ]
   evid = fp_cv_alcohol_evidence(p_miss, texts)
-  covered = only_removed & evid$evidence == "non_alcoholic"
-  uncovered = only_removed & !covered
-  add("removed_category_skus_not_alcoholic",
-    !any(uncovered), paste(miss[uncovered], collapse = ","))
-
   assort_cols = c("date", "warehouse_id", "change_type", "sku",
     "product_name", "prior_categories", "last_observed_date",
-    "alcohol_evidence", "evidence_reason", "note")
+    "alcohol_evidence", "evidence_reason", "note", "prior_abv_pct")
   last_date = substr(p_miss$observed_at, 1, 10)
   assort = if (!length(miss)) {
     as.data.frame(setNames(
@@ -251,11 +254,10 @@ fp_cv_assess = \(run_dir, prior_dir = NULL, prior_texts_csv = NULL,
     last_observed_date = last_date,
     alcohol_evidence = evid$evidence,
     evidence_reason = evid$reason,
-    note = ifelse(
-      only_removed,
-      "category removed from shop tree; not alcoholic",
-      "absence is not proof of unavailability or delisting"
-    ),
+    note = ifelse(only_removed,
+      "previous category absent; product not observed in covered lists",
+      "absence is not proof of unavailability or delisting"),
+    prior_abv_pct = p_miss$alcohol_content,
     stringsAsFactors = F
   )
   if (length(fresh)) {
@@ -269,6 +271,7 @@ fp_cv_assess = \(run_dir, prior_dir = NULL, prior_texts_csv = NULL,
       alcohol_evidence = NA_character_,
       evidence_reason = NA_character_,
       note = "first seen in this run",
+      prior_abv_pct = NA_character_,
       stringsAsFactors = F
     ))
   }

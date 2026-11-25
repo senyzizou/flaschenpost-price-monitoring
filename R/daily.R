@@ -85,6 +85,41 @@ fp_dy_release = \(mw, auto, wid, date, today, store_wids) {
 # 2) RECOVER OR COLLECT UNDER THE SAME REMOTE WRITER LOCK
 # <-----------------------------------------------------------------------------
 
+fp_dy_failure_codes = \(values) {
+  allowed = c("blocked_coverage", "blocked_collector", "blocked_privacy",
+    "interrupted_collection", "access_blocked", "http_403", "http_429",
+    "runtime_failure",
+    "collector_blocker_is_category_only", "full_scope_run", "same_warehouse",
+    "scope_roots_in_tree", "all_current_categories_fetched",
+    "no_skipped_relevant_category", "replicate_lists_stable",
+    "outside_scope_probe_clean", "sku_unique", "membership_matches_variants",
+    "membership_uses_fetched_categories", "listing_counts_match_membership",
+    "removed_categories_gone_from_tree", "classification_rules_applied",
+    "scope_root_missing", "no_subcategory_fetched", "empty_inventory",
+    "duplicate_sku", "invalid_price", "details_not_collected",
+    "sku_conflict_between_lists", "detail_missing_for_key",
+    "brand_crosscheck_missing_sku", "category_tree_differs_from_reviewed_set",
+    "list_unstable_between_fetches", "alcohol_found_outside_scope_roots",
+    "outside_probe_detail_missing", "outside_scope_probe_not_run",
+    "sensitivity_not_subset_of_primary",
+    "difference_is_not_the_documented_0_5_rows",
+    "not_applied_decision_counted_as_ready",
+    "warehouse_configured", "observation_unit", "two_independent_sessions",
+    "session_count_backed_by_evidence", "category_baseline_state",
+    "release_valid_for_date_and_warehouse", "regional_flags",
+    "pacing_at_least_config_interval", "attempts_left",
+    "not_already_committed", "store_exists_with_chain",
+    "output_inside_regional_project", "output_path_not_forbidden")
+  intersect(values, allowed)
+}
+
+fp_dy_report_codes = \(values) {
+  codes = fp_dy_failure_codes(values)
+  if (!length(codes)) codes = "runtime_failure"
+  cat("Failure codes:", paste(codes, collapse = ", "), "\n")
+  invisible(codes)
+}
+
 fp_dy_attempt = \(root, fp, release, cfg, store, work, transport,
   attempt, date, wid, started, site = NULL, clock = Sys.time,
   capture_run = fp_lr_run_warehouse) {
@@ -94,8 +129,14 @@ fp_dy_attempt = \(root, fp, release, cfg, store, work, transport,
     return(fp_rc_publish(transport, attempt, capture, store, date, wid))
   }
   rejected = paste0(attempt, "/rejected.rds")
-  if (!is.null(fp_rc_get(transport, rejected))) return(NULL)
-  if (!is.null(fp_rc_get(transport, paste0(attempt, "/access_block.rds")))) {
+  rejection = fp_rc_get(transport, rejected)
+  if (!is.null(rejection)) {
+    fp_dy_report_codes(unlist(rejection, use.names = F))
+    return(NULL)
+  }
+  access = fp_rc_get(transport, paste0(attempt, "/access_block.rds"))
+  if (!is.null(access)) {
+    fp_dy_report_codes(c("access_blocked", paste0("http_", access)))
     return(NULL)
   }
   run_id = paste0("run_w", wid, "_", date, "_", basename(attempt))
@@ -112,7 +153,9 @@ fp_dy_attempt = \(root, fp, release, cfg, store, work, transport,
     clock = ctx$clock, sleep = wait, run_id = run_id),
     fp_capture_incomplete = \(e) list(status = "interrupted_collection"))
   if (!result$status %in% c("committed", "already_committed")) {
-    fp_rc_put(transport, rejected, result$status)
+    codes = fp_dy_report_codes(c(result$status, result$failed,
+      result$blocking))
+    fp_rc_put(transport, rejected, list(status = result$status, checks = codes))
     return(NULL)
   }
   id = fp_vs_find_commit(store, date, wid)
@@ -166,6 +209,7 @@ fp_dy_run_day = \(root, fp, mw, cfg, auto, store, work, transport,
             transport, attempt, date, wid, started, capture_run = capture_run)
           if (!is.null(id)) break
         }
+        historical = NULL
         previous = fp_vs_find_commit(store, date, wid)
         if (is.null(id) && !is.null(previous)) {
           receipt = jsonlite::read_json(file.path(store, "commits",
@@ -174,6 +218,11 @@ fp_dy_run_day = \(root, fp, mw, cfg, auto, store, work, transport,
           if (date == today || startsWith(receipt$run_id, run_prefix)) {
             stop("Store commit has no verified raw archive.")
           }
+          id = previous
+          archived = fp_rm_verify_historical_archive(transport, date, wid,
+            receipt$run_id)
+          historical = if (archived) "verified_historical" else
+            "historical_archive_missing"
         }
         blocked = any(vapply(attempts, \(name) {
           path = paste0(dir, "/", name, "/access_block.rds")
@@ -184,7 +233,8 @@ fp_dy_run_day = \(root, fp, mw, cfg, auto, store, work, transport,
           pre = fp_lr_preflight(root, release$mw, cfg, wid, date, store,
             work, work, as.integer(fp$runner$min_interval_seconds))
           if (!pre$ok) {
-            stop(paste(pre$checks$check[!pre$checks$ok], collapse = ", "))
+            fp_dy_report_codes(pre$checks$check[!pre$checks$ok])
+            stop("Preflight failed.", call. = F)
           }
           attempt = sprintf("%s/a%02d", dir, length(attempts) + 1L)
           started = list(time = berlin_clock(),
@@ -195,7 +245,9 @@ fp_dy_run_day = \(root, fp, mw, cfg, auto, store, work, transport,
             transport, attempt, date, wid, started, site, berlin_clock,
             capture_run)
         }
-        status = if (!is.null(id)) "verified" else if (blocked) {
+        status = if (!is.null(historical)) historical else if (!is.null(id)) {
+          "verified"
+        } else if (blocked) {
           "access_blocked"
         } else "incomplete"
         rows[[length(rows) + 1L]] = data.frame(date = date,
@@ -207,6 +259,85 @@ fp_dy_run_day = \(root, fp, mw, cfg, auto, store, work, transport,
     complete = all(days$status[days$date == today] == "verified")
     list(status = if (complete) "complete" else "incomplete",
       date = today, warehouses = days)
+  })
+}
+
+# <=============================================================================
+# <=============================================================================
+# <=============================================================================
+
+# 3) EXPLICIT OFFLINE REASSESSMENT OF AN IMMUTABLE REJECTION
+# <-----------------------------------------------------------------------------
+
+fp_dy_reassess = \(root, fp, mw, cfg, store, work, transport,
+  date, wid, attempt_id, captured_revision, assessment_revision,
+  expected_skus, authorization_run, capture_run = fp_lr_run_warehouse) {
+  stopifnot(grepl("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", date),
+    !is.na(as.Date(date)), grepl("^a[0-9]{2}$", attempt_id),
+    wid %in% rp_mw_ids(mw), expected_skus > 0L,
+    grepl("^[0-9a-f]{40}$", captured_revision),
+    grepl("^[0-9a-f]{40}$", assessment_revision),
+    grepl("^[0-9]+$", authorization_run))
+  attempt = sprintf("%s/runs/%s/w%d/%s", fp_rm_base, date, wid, attempt_id)
+  run_id = paste0("run_w", wid, "_", date, "_", attempt_id)
+  fp_rm_with_lock(transport, \() {
+    fp_rm_restore(transport, store)
+    old_files = list.files(store, recursive = T)
+    old_hashes = vapply(file.path(store, old_files), fp_vs_hash, "")
+    history = fp_vs_history(store)
+    stopifnot(all(vapply(history, \(m) m$date <= date, logical(1))))
+    started = fp_rc_get(transport, paste0(attempt, "/started.rds"))
+    rejected = fp_rc_get(transport, paste0(attempt, "/rejected.rds"))
+    reason = if (is.list(rejected)) rejected$status else rejected
+    stopifnot(identical(started$revision, captured_revision),
+      identical(reason, "blocked_coverage"),
+      is.null(fp_rc_get(transport, paste0(attempt, "/access_block.rds"))))
+    proof = list(mode = "manual_offline_reassessment",
+      capture_revision = captured_revision,
+      assessment_revision = assessment_revision,
+      previous_status = reason, authorization_run = authorization_run)
+    capture = fp_rc_read_checkpoint(transport, attempt)
+    id = fp_vs_find_commit(store, date, wid)
+    if (is.null(capture)) {
+      stopifnot(is.null(id))
+      cfg$live_authorized = T
+      cfg$terms_cleared = T
+      ctx = fp_rc_capture(transport, attempt, started$time)
+      result = capture_run(root, fp, mw, cfg, wid, date, store, work,
+        transport = ctx$request, clock = ctx$clock,
+        sleep = \(seconds) invisible(NULL), run_id = run_id,
+        reassessment = proof)
+      if (!identical(result$status, "committed")) {
+        fp_dy_report_codes(c(result$status, result$failed, result$blocking))
+        stop("Offline reassessment failed.", call. = F)
+      }
+      id = fp_vs_find_commit(store, date, wid)
+      stopifnot(!is.null(id), fp_vs_history(store)[[id]]$n_products ==
+        expected_skus, setequal(fp_rm_children(transport,
+          paste0(attempt, "/responses")),
+          sprintf("%04d.rds", result$calls$seq)))
+      capture = fp_rc_checkpoint(transport, attempt, store, id,
+        result$calls, run_id, result$raw_dir)
+    }
+    files = capture$marker$files$file
+    receipt = jsonlite::fromJSON(rawToChar(capture$bodies[[
+      match("origin_receipt.json", files)]]))
+    stopifnot(identical(receipt$run_id, run_id),
+      receipt$n_products == expected_skus,
+      identical(receipt$reassessment[names(proof)[1:4]], proof[1:4]))
+    id = fp_rc_publish(transport, attempt, capture, store, date, wid)
+    restored = file.path(work, "verified_reassessment")
+    fp_rm_restore(transport, restored)
+    h = fp_vs_history(restored)
+    keys = vapply(h, \(m) paste(m$date, m$warehouse_id), "")
+    stopifnot(!anyDuplicated(keys), h[[id]]$n_products == expected_skus,
+      identical(id, fp_vs_find_commit(restored, date, wid)),
+      identical(unname(old_hashes), unname(vapply(
+        file.path(restored, old_files), fp_vs_hash, ""))),
+      identical(rejected, fp_rc_get(transport, paste0(attempt,
+        "/rejected.rds"))))
+    list(commit = id, skus = expected_skus, responses = nrow(capture$raw),
+      manifest_sha256 = capture$marker$manifest_sha256)
   })
 }
 

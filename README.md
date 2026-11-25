@@ -85,3 +85,15 @@ Bei einem Versionswechsel einen unterbrochenen Lauf ohne Zwischenstand
 zuerst mit seiner ursprünglichen Workflow-Revision wiederaufnehmen.
 Ein späterer Lauf rekonstruiert nur gespeicherte historische Antworten. Neue
 Händlerabfragen gelten immer für den aktuellen Berliner Tag.
+
+### Archivierten Versuch offline neu bewerten
+
+Nach ausdrücklicher Freigabe auf `main` den manuellen Modus `reassess`
+mit Berliner Datum, Versuchs-ID, ursprünglichem Commit-SHA und der
+offline bestätigten SKU-Zahl auslösen. Der Workflow prüft die gespeicherte
+Revisionsbindung und unveränderte Collector-Dateien. Er liest die
+gespeicherten Antworten aus UKEbox und nutzt die aktuellen
+Abdeckungsprüfungen. Der neue Tagesbeleg dokumentiert beide Revisionen und
+den autorisierenden Workflow-Lauf. Die ursprüngliche Ablehnung und das
+Rohjournal bleiben erhalten. Die Neubewertung stellt keine Anfragen an
+Flaschenpost.

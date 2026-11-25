@@ -52,6 +52,8 @@ fp_rc_capture = \(transport, attempt, started, http = NULL, clock = Sys.time) {
       if (isTRUE(answer$status %in% c(403L, 429L))) {
         fp_rc_put(transport, paste0(attempt, "/access_block.rds"),
           as.integer(answer$status))
+        stop(errorCondition("HTTP access blocked.", code = answer$status,
+          class = "fp_access_blocked"))
       }
       if (!isTRUE(answer$status == 200L)) return(answer)
       entry = list(request = signature, time = clock(),
