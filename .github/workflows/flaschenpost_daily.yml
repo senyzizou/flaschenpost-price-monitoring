@@ -24,10 +24,9 @@ on:
       expected_skus:
         description: Observed SKU count independently confirmed by replay
         type: string
-  # Enable after the Ubuntu, UKEbox and manual collection checks pass.
-  # schedule:
-  #   - cron: '15 10 * * *'
-  #     timezone: Europe/Berlin
+  schedule:
+    - cron: '15 10 * * *'
+      timezone: Europe/Berlin
 
 permissions:
   contents: read
