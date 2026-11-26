@@ -139,20 +139,26 @@ make_mock_transport = \() {
 # <=============================================================================
 # <=============================================================================
 
-# 2) HELPER: BUILD LOCAL STORE WITH N COMMITS
+# 2) HELPER: BUILD OR EXTEND A LOCAL STORE
 # <-----------------------------------------------------------------------------
 
 make_test_store = \(n_commits = 1L,
-  base_date = "2026-11-10") {
-  store = file.path(tmp_root,
-    paste0("store_", n_commits, "_",
-      format(Sys.time(), "%H%M%OS3"), "_",
-      sample.int(9999, 1)))
-  fp_vs_init(store)
+  base_date = "2026-11-10", ancestor = NULL) {
+  store = tempfile("store_", tmpdir = tmp_root)
+  existing = 0L
+  if (is.null(ancestor)) {
+    fp_vs_init(store)
+  } else {
+    existing = length(fp_vs_history(ancestor))
+    stopifnot(dir.create(store), all(file.copy(
+      list.files(ancestor, all.files = T, no.. = T, full.names = T),
+      store, recursive = T
+    )))
+  }
   fix = file.path(fixtures, "synthetic_w36.csv")
   raw = read.csv(fix, stringsAsFactors = F,
     colClasses = "character")
-  for (i in seq_len(n_commits)) {
+  for (i in existing + seq_len(n_commits)) {
     date = as.character(
       as.Date(base_date) + (i - 1L))
     wid = c(36L, 26L, 37L, 32L)[
@@ -248,7 +254,7 @@ store2 = make_test_store(1L)
 t2 = make_mock_transport()
 fp_rm_publish_store(t2, store2)
 
-store2b = make_test_store(2L, "2026-11-10")
+store2b = make_test_store(ancestor = store2)
 check("sync detects unpublished local commit", {
   cmp = fp_rm_compare(t2, store2b)
   nrow(cmp$local_only) == 1L
@@ -305,7 +311,7 @@ store4 = make_test_store(1L)
 t4 = make_mock_transport()
 fp_rm_publish_store(t4, store4)
 
-store4b = make_test_store(2L, "2026-11-10")
+store4b = make_test_store(ancestor = store4)
 
 # Manually upload unit without marker
 dir4 = file.path(store4b, "commits", "c0002")
@@ -363,7 +369,7 @@ store6a = make_test_store(1L)
 t6 = make_mock_transport()
 fp_rm_publish_store(t6, store6a)
 
-store6b = make_test_store(3L, "2026-11-10")
+store6b = make_test_store(2L, ancestor = store6a)
 
 check("two unpublished commits detected", {
   cmp = fp_rm_compare(t6, store6b)
